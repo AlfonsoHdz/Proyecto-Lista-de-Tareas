@@ -6,14 +6,35 @@ export default class Model{
     //No hace falta colocar function antes del nombre
     constructor(){
         this.view = null;
-        this.todos = [];
-        this.currentId = 1;
+        //Obtenemos el objeto del navegador
+        this.todos = JSON.parse(localStorage.getItem('todos'));
+        //Valida si es null/undefined o si la lista esta vacía 
+        if(!this.todos || this.todos.length <1){
+            this.todos = [
+                {
+                    id:0,
+                    title: 'Titulo Ejemplo',
+                    description: 'Este es una descripcion',
+                    completed: false,
+                }
+            ]
+            this.currentId = 1;    
+        }else{
+            //Si tiene elementos, agregamos el currentId
+            this.currentId = this.todos[this.todos.length - 1].id + 1;
+        }
     }
 
     //Funcion que recibe una vista
     setView(view){
         //Asignamos la vista a la vista que nos pasan
         this.view = view;
+    }
+
+    //Guardar en el local storage
+    save(){
+        //Guardamos en el navegador el JSON del objeto todos
+        localStorage.setItem('todos', JSON.stringify(this.todos));
     }
 
     //Obtenemos los TODOS 
@@ -32,7 +53,7 @@ export default class Model{
         const index = this.findTodo(id);
         const todo = this.todos[index];
         todo.completed = !todo.completed;
-        console.log(this.todos);
+        this.save();
     }
 
     addTodo(title, description){
@@ -63,6 +84,7 @@ export default class Model{
         //assign es el que copia las propiedades
         //return Object.assign({}, todo);  -----------------------------------
 
+        this.save()
         //Es = con Spread Syntax, hace un clon :)
         //Expande los valores de todo y hace un clon revisa tus NOTAS xd
         return{...todo};
@@ -77,6 +99,7 @@ export default class Model{
         //De los todos(es un array), con splice que borra los elementos que le especifiquemos a partir 
         //de un indice. Queremoa q borre solo 1 xd
         this.todos.splice(index,1);
+        this.save();
 
     
     }

@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     //Ahora asignamos a la View
     view.setModel(model);
 
-
+    view.render();
 })
 
 

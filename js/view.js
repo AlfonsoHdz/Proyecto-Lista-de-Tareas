@@ -31,6 +31,14 @@ export default class View{
         this.model = model;
     }
 
+    render(){
+        const todos = this.model.getTodos();
+        for(let i=0; i < todos.length; i++ ){
+            this.createRow(todos[i]);
+        }
+        
+    }
+
     addTodo(title, description){
         //Invocamos el addTodo del Model
         const todo = this.model.addTodo(title, description);

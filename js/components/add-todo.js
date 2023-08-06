@@ -1,3 +1,5 @@
+import Alert from './alert.js';
+
 export default class AddTodo{
     constructor(){
         //Colocamos el atributo a la clase
@@ -5,6 +7,8 @@ export default class AddTodo{
         this.btn = document.getElementById('add');
         this.title = document.getElementById('title');
         this.description = document.getElementById('description');
+
+        this.alert = new Alert('alert');
     }
 
     //Recibe una funcion 
@@ -16,9 +20,10 @@ export default class AddTodo{
                 // alert.classList.remove('d-none');
                 // alert.innerText = 'Title and description are required';
                 // return;
-                console.error('Incorrecto');
+                this.alert.show('Title and description are required');
             }else{
                 //Llamamos la funcion del parametro y le pasamos los atrubutos
+                this.alert.hide();
                 callback(this.title.value,this.description.value);
             }
 
