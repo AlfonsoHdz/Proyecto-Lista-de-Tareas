@@ -21,7 +21,7 @@ export default class Model{
             this.currentId = 1;    
         }else{
             //Si tiene elementos, agregamos el currentId
-            this.currentId = this.todos[this.todos.length - 1].id + 1;
+            this.currentId = this.todos[this.todos.length];
         }
     }
 
@@ -39,7 +39,12 @@ export default class Model{
 
     //Obtenemos los TODOS 
     getTodos(){
-        return this.todos;
+        const todos = []; 
+        for(const todo of this.todos){
+            todos.push({...todo});
+        }
+
+        return todos;
     }
 
     //Podemos crear una funcion que haga lo de findIndex
@@ -89,6 +94,12 @@ export default class Model{
         //Expande los valores de todo y hace un clon revisa tus NOTAS xd
         return{...todo};
 
+    }
+
+    editTodo(id,values){
+        const index = this.findTodo(id);
+        Object.assign(this.todos[index], values);
+        this.save();
     }
 
     removeTodo(id){

@@ -1,4 +1,6 @@
 import AddTodo from "./components/add-todo.js";
+import Modal from "./components/modal.js";
+import Filters from './components/filters.js'
 
 export default class View{
     constructor(){
@@ -9,6 +11,8 @@ export default class View{
        
         //Instanciamos la clase
         this.addTodoForm = new AddTodo();
+        this.modal = new Modal();
+        this.filters = new Filters();
         
         //ESTE CODIGO SOLO ACCEDE A OBJETO DE FUNCTION
         //NOTA: REVISA LAS NOTAS PA ENTENDER
@@ -23,6 +27,8 @@ export default class View{
         //Llamamos a la funcion del addTODO
         //Creamos una funcion anonima y le pasamos los parametros a al addTodo de abajo
         this.addTodoForm.onClick((title, description) => this.addTodo(title, description));
+        this.modal.onClick((id, values) => this.editTodo(id, values));
+        this.filters.onClick((filters) => this.filter(filters))
 
     }
 
@@ -39,6 +45,34 @@ export default class View{
         
     }
 
+    filter(filters){
+        const {type, words} = filters;
+        const [, ...rows] = this.table.getElementsByTagName('tr');
+        for(const row of rows){
+            const[title, description, completed] = row.children;
+            let shouldHide = false;
+
+            if(words){
+                shouldHide = !title.innerText.includes(words) && !description.innerText.includes(words);
+            }
+
+            const shouldBeCompleted = type === 'completed';
+            const isCompleted = completed.children[0].checked;
+
+            if(type !== 'all' && shouldBeCompleted !== isCompleted){
+                shouldHide = true;
+            }
+
+            if(shouldHide){
+                row.classList.add('d-none');
+            }else{
+                row.classList.remove('d-none');
+            }
+            
+            
+        }
+    }
+
     addTodo(title, description){
         //Invocamos el addTodo del Model
         const todo = this.model.addTodo(title, description);
@@ -52,6 +86,14 @@ export default class View{
 
     toggleCompleted(id){
         this.model.toggleCompleted(id);
+    }
+
+    editTodo(id, values){
+        this.model.editTodo(id, values);
+        const row = document.getElementById(id);
+        row.children[0].innerText = values.title;
+        row.children[1].innerText = values.description;
+        row.children[2].children[0].checked = values.completed;
     }
 
     removeTodo(id){
@@ -78,9 +120,7 @@ export default class View{
                                                 
             </td>
             <td class="text-right">
-                <button class="btn btn-primary mb-1">
-                  <i class="fa fa-pencil"></i>
-                </button>
+                
             </td>
         `;
 
@@ -89,6 +129,20 @@ export default class View{
         checkbox.checked = todo.completed;
         checkbox.onclick = () => this.toggleCompleted(todo.id);
         row.children[2].appendChild(checkbox);
+
+
+        const editBtn = document.createElement('button');
+        editBtn.classList.add('btn','btn-primary','mb-1');
+        editBtn.innerHTML = '<i class="fa fa-pencil"></i>';
+        editBtn.setAttribute('data-toggle','modal');
+        editBtn.setAttribute('data-target','#modal');
+        editBtn.onclick = () => this.modal.setValues({
+            id: todo.id,
+            title: row.children[0].innerText,
+            description: row.children[1].innerText,
+            completed: row.children[2].children[0].checked, 
+        });
+        row.children[3].appendChild(editBtn);
 
         //No agregamos el boton en el innerHTML
         //Para utilizar la constante con un evento
